@@ -49,14 +49,11 @@ module Houston
 
           connection.write(notification.message)
           notification.mark_as_sent!
-
-          read_socket, write_socket = IO.select([ssl], [ssl], [ssl], nil)
-          if (read_socket && read_socket[0])
-            if error = connection.read(6)
-              command, status, index = error.unpack("ccN")
-              notification.apns_error_code = status
-              notification.mark_as_unsent!
-            end
+          
+          if error = connection.read(6)
+            command, status, index = error.unpack("ccN")
+            notification.apns_error_code = status
+            notification.mark_as_unsent!
           end
         end
       end
